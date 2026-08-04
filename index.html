@@ -1,0 +1,691 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محاسبه زمان معکوس</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 20px 40px;
+    }
+
+    .app-card {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 42px;
+      padding: 30px 24px 36px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s;
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      text-align: center;
+      letter-spacing: 1px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .input-group {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 80px;
+      padding: 6px 6px 6px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px);
+      margin-bottom: 18px;
+      transition: 0.2s;
+    }
+    .input-group:focus-within {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    .input-group input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 16px 6px 16px 0;
+      font-size: 1.2rem;
+      color: #f8fafc;
+      outline: none;
+      font-weight: 400;
+      min-width: 0;
+    }
+    .input-group input::placeholder {
+      color: #94a3b8;
+      font-weight: 300;
+      font-size: 1rem;
+    }
+    .input-group input[type="number"] {
+      -moz-appearance: textfield;
+    }
+    .input-group input[type="number"]::-webkit-inner-spin-button,
+    .input-group input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .input-group button {
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+      box-shadow: 0 6px 14px rgba(59, 130, 246, 0.3);
+    }
+    .input-group button:hover {
+      background: #2563eb;
+      transform: scale(1.02);
+      box-shadow: 0 8px 18px rgba(59, 130, 246, 0.4);
+    }
+    .input-group button:active {
+      transform: scale(0.96);
+    }
+
+    .result-box {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 40px;
+      padding: 16px 22px;
+      margin: 20px 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-left: 4px solid #60a5fa;
+      backdrop-filter: blur(2px);
+    }
+    .result-time {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      letter-spacing: 1px;
+      background: rgba(255,255,255,0.02);
+      padding: 4px 14px;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .result-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .result-actions button {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      padding: 10px 18px;
+      border-radius: 60px;
+      font-size: 0.95rem;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.15s;
+      backdrop-filter: blur(2px);
+    }
+    .result-actions button:hover {
+      background: #3b82f6;
+      border-color: #3b82f6;
+      color: #fff;
+      box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .save-name-area {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 6px 0 16px;
+      background: rgba(0,0,0,0.2);
+      padding: 8px 12px;
+      border-radius: 60px;
+      border: 1px dashed rgba(255,255,255,0.1);
+      transition: 0.2s;
+    }
+    .save-name-area.hidden {
+      display: none;
+    }
+    .save-name-area input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 12px 12px;
+      color: #f1f5f9;
+      font-size: 1rem;
+      outline: none;
+    }
+    .save-name-area input::placeholder {
+      color: #94a3b8;
+    }
+    .save-name-area button {
+      background: #10b981;
+      border: none;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 60px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .save-name-area button:hover {
+      background: #059669;
+      transform: scale(1.02);
+    }
+
+    .search-box {
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 60px;
+      padding: 4px 4px 4px 18px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin: 14px 0 10px;
+      transition: 0.2s;
+    }
+    .search-box:focus-within {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+    }
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 12px 6px;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-box input::placeholder {
+      color: #64748b;
+    }
+    .search-box button {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.15s;
+      border-radius: 40px;
+    }
+    .search-box button:hover {
+      color: #f1f5f9;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin: 20px 0 12px;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+      padding: 0 6px;
+    }
+
+    .saved-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      padding-left: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #475569 #1e293b;
+    }
+    .saved-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .saved-list::-webkit-scrollbar-track {
+      background: #1e293b;
+      border-radius: 20px;
+    }
+    .saved-list::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 20px;
+    }
+
+    .list-item {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(2px);
+      border-radius: 50px;
+      padding: 12px 18px 12px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: 0.15s;
+    }
+    .list-item:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    .list-item .item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .list-item .item-name {
+      font-weight: 600;
+      color: #f1f5f9;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .list-item .item-time {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .list-item .delete-btn {
+      background: rgba(239, 68, 68, 0.15);
+      border: none;
+      color: #f87171;
+      width: 38px;
+      height: 38px;
+      border-radius: 40px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .list-item .delete-btn:hover {
+      background: #ef4444;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+      transform: scale(1.05);
+    }
+
+    .empty-message {
+      color: #64748b;
+      text-align: center;
+      padding: 28px 10px;
+      font-style: italic;
+      background: rgba(0,0,0,0.1);
+      border-radius: 60px;
+      backdrop-filter: blur(2px);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172aee;
+      backdrop-filter: blur(16px);
+      padding: 14px 28px;
+      border-radius: 60px;
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.7);
+      font-weight: 400;
+      z-index: 999;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-card">
+  <h1>
+    <span>⏰</span> زمان‌واره
+  </h1>
+
+  <div class="input-group">
+    <input type="number" id="minutesInput" placeholder="تعداد دقیقه (مثلاً ۳۰)" value="">
+    <button id="calcBtn">
+      <span>🧮</span> محاسبه
+    </button>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <div class="result-time">
+      <span>⏳</span>
+      <span id="resultDisplay">-- : --</span>
+    </div>
+    <div class="result-actions">
+      <button id="saveBtn">
+        <span>📌</span> ذخیره
+      </button>
+    </div>
+  </div>
+
+  <div class="save-name-area hidden" id="saveNameArea">
+    <input type="text" id="nameInput" placeholder="نام این زمان ...">
+    <button id="confirmSaveBtn">
+      <span>✅</span> ذخیره
+    </button>
+  </div>
+
+  <div class="search-box">
+    <span>🔍</span>
+    <input type="text" id="searchInput" placeholder="جستجو در نام رکوردها ...">
+    <button id="clearSearchBtn" title="پاک کردن جستجو"><span>❌</span></button>
+  </div>
+
+  <div class="list-header">
+    <span><span>📋</span> آخرین ذخیره‌ها</span>
+    <span style="font-size:0.8rem; color:#64748b;">تعداد: <span id="countBadge">۰</span></span>
+  </div>
+  <ul class="saved-list" id="savedList">
+    <li class="empty-message"><span>📭</span>  هیچ موردی ذخیره نشده</li>
+  </ul>
+</div>
+
+<div class="toast" id="toast"><span>✅</span> <span id="toastMsg">ذخیره شد</span></div>
+
+<script>
+  (function() {
+    "use strict";
+
+    const minutesInput = document.getElementById('minutesInput');
+    const calcBtn = document.getElementById('calcBtn');
+    const resultDisplay = document.getElementById('resultDisplay');
+    const saveBtn = document.getElementById('saveBtn');
+    const saveNameArea = document.getElementById('saveNameArea');
+    const nameInput = document.getElementById('nameInput');
+    const confirmSaveBtn = document.getElementById('confirmSaveBtn');
+    const savedListEl = document.getElementById('savedList');
+    const countBadge = document.getElementById('countBadge');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+    let savedItems = [];
+    let filteredItems = [];
+    let lastComputedDate = null;
+
+    function getPersianDate(date) {
+      if (!date) return '';
+      return date.toLocaleString('fa-IR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour12: false,
+        timeZone: 'Asia/Tehran'
+      }).split('،')[0];
+    }
+
+    function loadFromStorage() {
+      try {
+        const stored = localStorage.getItem('timeKeeper_items');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed)) {
+            savedItems = parsed.slice(0, 30);
+          }
+        }
+      } catch (_) {}
+      filteredItems = [...savedItems];
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem('timeKeeper_items', JSON.stringify(savedItems));
+      } catch (_) {}
+    }
+
+    function applyFilter() {
+      const query = searchInput.value.trim().toLowerCase();
+      if (query === '') {
+        filteredItems = [...savedItems];
+      } else {
+        filteredItems = savedItems.filter(item => 
+          (item.name || '').toLowerCase().includes(query)
+        );
+      }
+      renderList();
+    }
+
+    function renderList() {
+      savedListEl.innerHTML = '';
+
+      if (filteredItems.length === 0) {
+        const msg = savedItems.length === 0 ? 'هیچ موردی ذخیره نشده' : 'نتیجه‌ای یافت نشد';
+        savedListEl.innerHTML = `<li class="empty-message"><span>📭</span>  ${msg}</li>`;
+        countBadge.textContent = savedItems.length;
+        return;
+      }
+
+      countBadge.textContent = savedItems.length;
+
+      for (let i = 0; i < filteredItems.length; i++) {
+        const item = filteredItems[i];
+        const realIndex = savedItems.indexOf(item);
+        if (realIndex === -1) continue;
+
+        const li = document.createElement('li');
+        li.className = 'list-item';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'item-info';
+
+        const nameSpan = document.createElement('div');
+        nameSpan.className = 'item-name';
+        nameSpan.innerHTML = `<span>🏷️</span> ${escapeHtml(item.name || 'بدون نام')}`;
+
+        const timeSpan = document.createElement('div');
+        timeSpan.className = 'item-time';
+        let timeStr = item.time || '';
+        let dateStr = item.date || '';
+        timeSpan.innerHTML = `<span>📅</span> ${escapeHtml(dateStr)}  <span>🕐</span> ${escapeHtml(timeStr)}`;
+
+        infoDiv.appendChild(nameSpan);
+        infoDiv.appendChild(timeSpan);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.innerHTML = '🗑️';
+        delBtn.setAttribute('data-index', realIndex);
+
+        delBtn.addEventListener('click', function(e) {
+          const idx = parseInt(this.getAttribute('data-index'), 10);
+          if (!isNaN(idx) && idx >= 0 && idx < savedItems.length) {
+            savedItems.splice(idx, 1);
+            saveToStorage();
+            filteredItems = [...savedItems];
+            applyFilter();
+            showToast('رکورد حذف شد');
+          }
+        });
+
+        li.appendChild(infoDiv);
+        li.appendChild(delBtn);
+        savedListEl.appendChild(li);
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    let toastTimeout = null;
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+
+    function computeTime(minutes) {
+      if (isNaN(minutes) || minutes < 0) return null;
+      const now = new Date();
+      const newDate = new Date(now.getTime() - minutes * 60000);
+      return newDate;
+    }
+
+    function formatTime(date) {
+      if (!date) return '-- : --';
+      const h = String(date.getHours()).padStart(2, '0');
+      const m = String(date.getMinutes()).padStart(2, '0');
+      return `${h}:${m}`;
+    }
+
+    function updateResult() {
+      const val = parseInt(minutesInput.value, 10);
+      if (isNaN(val) || val < 0 || minutesInput.value.trim() === '') {
+        resultDisplay.textContent = '-- : --';
+        lastComputedDate = null;
+        return;
+      }
+      const computed = computeTime(val);
+      if (computed) {
+        resultDisplay.textContent = formatTime(computed);
+        lastComputedDate = computed;
+      } else {
+        resultDisplay.textContent = '-- : --';
+        lastComputedDate = null;
+      }
+    }
+
+    calcBtn.addEventListener('click', function() {
+      updateResult();
+    });
+
+    minutesInput.addEventListener('input', function() {
+      updateResult();
+    });
+    minutesInput.addEventListener('click', function(x) {
+      minutesInput.value=""
+    });
+
+    saveBtn.addEventListener('click', function() {
+      if (!lastComputedDate) {
+        showToast('ابتدا یک زمان معتبر محاسبه کنید');
+        return;
+      }
+      saveNameArea.classList.remove('hidden');
+      nameInput.value = '';
+      nameInput.focus();
+    });
+
+    confirmSaveBtn.addEventListener('click', function() {
+      if (!lastComputedDate) {
+        showToast('زمان معتبر نیست');
+        return;
+      }
+      const name = nameInput.value.trim() || 'بدون نام';
+      const timeStr = formatTime(lastComputedDate);
+      const dateStr = getPersianDate(lastComputedDate);
+
+      const newItem = {
+        name: name,
+        time: timeStr,
+        date: dateStr,
+        timestamp: Date.now()
+      };
+
+      savedItems.unshift(newItem);
+      if (savedItems.length > 30) {
+        savedItems = savedItems.slice(0, 30);
+      }
+      saveToStorage();
+      filteredItems = [...savedItems];
+      applyFilter();
+      saveNameArea.classList.add('hidden');
+      showToast(`«${escapeHtml(name)}» ذخیره شد`);
+    });
+
+    nameInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        confirmSaveBtn.click();
+      }
+    });
+
+    searchInput.addEventListener('input', function() {
+      applyFilter();
+    });
+
+    clearSearchBtn.addEventListener('click', function() {
+      searchInput.value = '';
+      applyFilter();
+      searchInput.focus();
+    });
+
+    loadFromStorage();
+    filteredItems = [...savedItems];
+    renderList();
+
+    setTimeout(() => {
+      updateResult();
+    }, 50);
+
+    setTimeout(() => {
+      showToast('عدد دقیقه را وارد و محاسبه کنید');
+    }, 400);
+
+  })();
+</script>
+
+</body>
+</html>
